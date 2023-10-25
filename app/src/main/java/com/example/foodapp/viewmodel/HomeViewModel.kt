@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.foodapp.pojo.CategoryList
+import com.example.foodapp.pojo.CategoryMeals
 import com.example.foodapp.pojo.Meal
 import com.example.foodapp.pojo.MealList
 import com.example.foodapp.retrofit.RetrofitInstance
@@ -14,6 +16,7 @@ import retrofit2.Response
 class HomeViewModel(): ViewModel() {
 
     private var randomMealLiveData = MutableLiveData<Meal>()
+    private var popularItemsLiveData = MutableLiveData<List<CategoryMeals>>()
 
     fun getRandomMeal(){
         RetrofitInstance.api.getRandomMeal().enqueue(object  : Callback<MealList> {
@@ -38,11 +41,35 @@ class HomeViewModel(): ViewModel() {
         })
     }
 
+
+    fun getPopularItems(){
+        RetrofitInstance.api.getPopularItems("Seafood").enqueue(object:Callback<CategoryList>{
+            override fun onResponse(call: Call<CategoryList>, response: Response<CategoryList>) {
+                //set the value to livedata above
+                //check if we have list of popular items
+                if(response.body() != null){
+                    popularItemsLiveData.value = response.body()!!.meals
+                }
+            }
+
+            override fun onFailure(call: Call<CategoryList>, t: Throwable) {
+                Log.d("Home Fragment", t.message.toString())
+            }
+        })
+    }
+
     //this public function help listen random meal livedata in home fragment
     //you can change the value of Mutablelivedata because you have function (value)...
     //but on livedata, only you can read its livedata
 
+
     fun observeRandomMealLivedata(): LiveData<Meal>{
         return randomMealLiveData
+    }
+
+    //this is to observe the getPopularitems
+
+    fun observePopularItemsLiveData():LiveData<List<CategoryMeals>>{
+        return popularItemsLiveData
     }
 }

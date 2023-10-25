@@ -19,7 +19,7 @@ class MealViewModel:ViewModel(){
     //function to get random meal and put inside the livedata
 
     fun getMealDetails(id:String){
-        RetrofitInstance.api.getMealDetails().enqueue(object : Callback<MealList>{
+        RetrofitInstance.api.getMealDetails(id).enqueue(object : Callback<MealList>{
             override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
                 if(response.body()!=null){
                     mealDetailsLiveData.value = response.body()!!.meals[0]
